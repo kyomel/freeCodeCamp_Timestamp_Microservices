@@ -21,26 +21,45 @@ app.get("/", function (req, res) {
 
 
 // your first API endpoint... 
-app.get("/api/date", function (req, res) {
-  res.json({ unix: Date.now(), utc: Date()});
+app.get("/api/hello", function (req, res) {
+  res.json({ greeting: 'hello API'});
 });
 
-app.get("/api/:date", function (req, res) {
-  let dateString = req.params.date_string;
-
-  if (/\d{5,}/.test(dateString)) {
-    const dateInt = parseInt(dateString);
-    res.json({ unix: dateInt, utc: new Date(dateInt).toUTCString() });
-  } else {
-    let dateObject = new Date(dateString);
-
-    if (dateObject.toString() === "Invalid Date") {
-      res.json({ error: "Invalid Date" });
-    } else {
-      res.json({ unix: dateObject.valueOf(), utc: dateObject.toUTCString() });
-    }
+app.get("/api/:date?", function (req, res) {
+  if(!req.params.date) {
+    res.json({
+      unix: Date.now(),
+      utc: new Date().toUTCString()
+    });
   }
-})
+
+  let date;
+  if (Number(req.params.date)) {
+    date = new Date(Number(req.params.date));
+  } else {
+    date = new Date(req.params.date);
+  }
+  console.log(
+    date,
+    req.params.date,
+    date instanceof Date,
+    typeof date,
+    date.toString()
+  );
+
+  if (date.toString() !== "Invalid Date") {
+    res.json({
+      unix: date.valueOf(),
+      utc: date.toUTCString()
+    });
+  }
+  
+  if (date.toString() === "Invalid Date") {
+    res.json({
+      error : "Invalid Date"
+    });
+  }
+});
 
 
 // listen for requests :)
